@@ -1,0 +1,50 @@
+Hi all,
+ 
+I prepared a wrapper for owping which executes owping, parses the result, packs
+them into json and sends them to the MQ Tobias prepared. Wrapper is just the
+alpha version, and I will work on improving it a bit (to see how to handle
+various irregular situations when there is no owamp answer, or there is a
+delayed reply, etc…). However, the results are now being sent to the queue, and
+we can get some first nice graphs. There are four messages every minute – one
+for each service instance from the lab in each direction, so you will see
+couple of thousands of messages in the queue when you start to get them in put
+the results in to the influx. I expanded a bit the set of metrics from the
+first version that I sent a couple of weeks ago, and included everything that
+owping is giving as a result.
+ 
+@Henrik: An example of monitoring result sent to the queue is given here:
+{"serviceID": "Service100", "timestamp": "2017-06-10T16:57:10.099", "source":
+"192.168.100.1", "destination": "192.168.100.2", "sent": 100.0, "lost": 0.0,
+"lost_pct": 0.0, "duplicates": 0.0, "latency_max": 0.222, "latency_min": 0.03,
+"latency_median": 0.2, "jitter": 0.0}  
+ 
+If you would like to use some other keys for the metrics, please suggest their
+names. Also, I didn’t want to make things more complicated and to put some
+complex json data structure into the results, but if you think we should do it,
+please suggest… To read data, I used the parameters Tobias gave us: connection
+= pika.BlockingConnection(pika.ConnectionParameters(host='172.16.0.21'))
+channel.queue_declare(queue='jsonExample')
+ 
+we should see whether we will need some “per Mode” queues or we can put
+everything in this one jsonExample (it seems to me that with per Mode queues
+processing can be simpler at the MRR end)…
+ 
+and to read the results, I had to decode them with: data =
+json.loads(body.decode('utf-8'))
+ 
+Henrik, please if there is any additional info that you might need for putting
+this into the influx and grafana, do not hesitate to ask!
+ 
+@David: Pings are going with ServiceID in the owping packets (service100 and
+service200), so you could use this as well
+ 
+@Pascal, others I added Cesnet clocks which are in the same data centre as our
+lab to the ntp config in all MAs, and the problem of bad time synchronization
+persists. I discussed with the T1 the problem. It seems that the “left” part of
+the lab topology (which is on one server, while MA4 and MA5 are in the other)
+has some issues with the synchronization, and they will look into it. They
+suspect some virtual network config problem. Anyway, even if they don’t fix
+this soon, the numbers are not so important right now. We should focus on
+assembling all parts into the system which makes does what we want it to do.
+ 
+Best regards, Pavle.
