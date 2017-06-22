@@ -18,9 +18,10 @@ class Aggregator(object):
 
     def get_next_chunk_to_load_id(self):
         for l in self.metadata.lines:
-            if l.is_complete() and not l.already_loaded:
-                l.already_loaded = True
-                return l.index
+            if l.is_complete():
+                r = l.index
+                self.metadata.delete(l)
+                return r
         return None
 
     def update_files_meta(self,files):
@@ -86,6 +87,9 @@ class ChunksMetadata(object):
         new_line = Line(len(self.lines),self.width)
         new_line.set_true_at(col)
         self.lines.append(new_line)
+
+    def delete(self,l):
+        self.lines.remove(l)
 
     def str_lines(self):
         r = ""
