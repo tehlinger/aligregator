@@ -134,7 +134,7 @@ class SegStats:
 
         for p in flow_data.items():
             analyzer.add_packet(p)
-
+	    
         result = analyzer.summary()
         return result
 
@@ -312,4 +312,8 @@ class LossesStats(object):
     def calc(self,losses):
         self.l = losses["losses"]
         self.s = losses["successes"]
-        self.ratio = float(self.s)/float(self.l + self.s)
+        try:
+            self.ratio = float(self.s)/float(self.l + self.s)
+        except ZeroDivisionError:
+            self.ratio = 0
+

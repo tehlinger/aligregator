@@ -261,7 +261,7 @@ class Packet:
     def delay_between(self,start=-1,stop=-1):
         if self.is_end_to_end(start,stop):
             if not self.first or not self.last:
-                raise NameError('Packet missing a timestamp.')
+                raise NameError('Packet missing a timestamp : \n'+str(self))
             else:
                 result = float(self.last) - float(self.first)
                 return result
