@@ -76,6 +76,7 @@ def loop(args):
                     logger.info("sent N°"+str(r.chunk_id))
                     #print("sent N°"+str(r.chunk_id))
                     #print(r)
+                    print(r.to_json())
                     send_msg(r.to_json())
                 update_current_chunks(file_data,agg,args)
                 sleep (SLEEP_TIME)

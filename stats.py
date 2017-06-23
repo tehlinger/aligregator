@@ -51,7 +51,7 @@ class FlowStats(object):
         self.segs = []
         self.seg_infos = n_seg_infos
         if data:
-            self.e2e = SegStats(data)
+            self.e2e = SegStats(data,e2e=True)
             self.segs = []
             if self.seg_infos:
                 if self.seg_infos.has_intermediates():
@@ -87,7 +87,8 @@ class FlowStats(object):
         self.e2e.bw_stats = copy.deepcopy(min_bw)
 
 class SegStats:
-    def __init__(self,flow_data=None,start=-1,stop=-1,seg_infos=None):
+    def __init__(self,flow_data=None,start=-1,stop=-1,seg_infos=None,e2e=False):
+        self.is_e2e = e2e
         self.jit_stats = JitterStats()
         self.del_stats = DelayStats()
         self.loss_stats = LossesStats()
@@ -106,6 +107,7 @@ class SegStats:
                     self.incoherent_stats else "\t\t\tIncoherent flow in this chunk."
 
     def __iter__(self):
+        yield("parent","e2e" if not self.is_e2e else "None")
         yield("j",dict(self.jit_stats))
         yield("d",dict(self.del_stats))
         yield("l",dict(self.loss_stats))
