@@ -18,9 +18,10 @@ class Aggregator(object):
 
     def get_next_chunk_to_load_id(self):
         for l in self.metadata.lines:
-            if l.is_complete():
+            if l.is_complete() and l.has_never_been_loaded():
                 r = l.index
-                self.metadata.delete(l)
+                #self.metadata.delete(l)
+                l.mark_as_loaded()
                 return r
         return None
 
@@ -47,8 +48,6 @@ class Aggregator(object):
     def has_nothing_to_do(self):
         return not self.last_chunk_is_complete and not\
     self.must_delete_last_chunk
-
-
 
 class ChunksMetadata(object):
 
@@ -115,7 +114,6 @@ class ChunksMetadata(object):
         else:
             raise ValueError('Chunk metadata width smaller than '+str(col))
 
-
 class Line:
 
     def __init__(self,new_chunk_index, n_width):
@@ -128,7 +126,8 @@ class Line:
                 self.values == other.values
 
     def __str__(self):
-        return "["+str(self.index)+" : "+str(self.values) +" ]"
+        s = "NO" if not self.already_loaded else "YES"
+        return "[LOADED : "+s+" "+str(self.index)+" : "+str(self.values) +" ]"
 
     def set_true_at(self,i):
         if i < len(self.values):
@@ -142,3 +141,9 @@ class Line:
             if not state:
                 return False
         return True
+    
+    def mark_as_loaded(self):
+        self.already_loaded = True
+
+    def has_never_been_loaded(self):
+       return not self.already_loaded 

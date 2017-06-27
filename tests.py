@@ -307,14 +307,14 @@ class TestAggregator(unittest.TestCase):
         self.assertFalse(m_data.has(1,1))
         self.assertRaises(ValueError,m_data.has,1,3)
 
-    def test_remove_useless_line(self):
-        agg = Aggregator(["MA4","MA3","MA5"])
-        agg.add(0,2)
-        agg.add(0,1)
-        agg.add(0,0)
-        i = agg.get_next_chunk_to_load_id()
-        self.assertEqual(i,0)
-        self.assertEqual(len(agg.metadata.lines),0)
+    #def test_remove_useless_line(self):
+    #    agg = Aggregator(["MA4","MA3","MA5"])
+    #    agg.add(0,2)
+    #    agg.add(0,1)
+    #    agg.add(0,0)
+    #    i = agg.get_next_chunk_to_load_id()
+    #    self.assertEqual(i,0)
+    #    self.assertEqual(len(agg.metadata.lines),0)
 
     def test_line(self):
         l = Line(0,3)
@@ -328,6 +328,35 @@ class TestAggregator(unittest.TestCase):
         l.set_true_at(1)
         l.set_true_at(2)
         self.assertTrue(l.is_complete())
+
+    def test_agg_fill_meta(self):
+        files1 =\
+                ["data/test_agg/pc1_agg1.dat","data/test_agg/pc1_agg1.dat","data/test_agg/pc1_agg1.dat"]
+        files2 =\
+                ["data/test_agg/pc1_agg2.dat","data/test_agg/pc1_agg2.dat","data/test_agg/pc1_agg2.dat"]
+        agg = Aggregator(["pc1","pc2","pc3"])
+        agg.update_files_meta(files1)
+        self.assertEqual(len(agg.metadata.lines),4)
+        agg.update_files_meta(files2)
+        self.assertEqual(len(agg.metadata.lines),7)
+
+    def test_get_id_alters_agg(self):
+        files1 =\
+                ["data/test_agg/pc1_agg1.dat","data/test_agg/pc1_agg1.dat","data/test_agg/pc1_agg1.dat"]
+        files2 =\
+                ["data/test_agg/pc1_agg2.dat","data/test_agg/pc1_agg2.dat","data/test_agg/pc1_agg2.dat"]
+        agg = Aggregator(["pc1","pc2","pc3"])
+        agg.update_files_meta(files1)
+        self.assertEqual(len(agg.metadata.lines),4)
+        agg.update_files_meta(files2)
+        self.assertEqual(len(agg.metadata.lines),7)
+        for i in range(5):
+            a = agg.get_next_chunk_to_load_id()
+        self.assertEqual(agg.metadata.lines[0].already_loaded, True)
+        self.assertEqual(agg.metadata.lines[3].already_loaded, True)
+        self.assertEqual(agg.metadata.lines[4].already_loaded, True)
+        self.assertEqual(agg.metadata.lines[6].already_loaded, False)
+
 
     def setUp(self):
         self.good_agg = Aggregator(["MA4","MA3","MA5"])

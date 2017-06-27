@@ -1,3 +1,4 @@
 *.pyc
+*.swp
 probe_launcher.py
 demoloop.fish
