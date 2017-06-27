@@ -383,6 +383,9 @@ class Seg_manager:
     def __str__(self):
         return self.get_all_segs()
 
+    def e2e_lbl(self):
+	    return str(self.agent_ids[0])+":"+str(self.agent_ids[-1])
+
     def has_intermediates(self):
         return self.num_segs > 0
 

@@ -22,6 +22,10 @@ class GlobalStats:
     def to_json(self):
          return json.dumps(dict(self))
 
+    def to_printable_json(self):
+         return json.dumps(dict(self),\
+			 indent=1, separators=(',', ': '))
+
     #Iterator used for to_json() method
     def __iter__(self):
         yield('bds',self.bounds)
@@ -75,9 +79,13 @@ class FlowStats(object):
 
     def __iter__(self):
         if(self.e2e != None):
-            yield("e2e",dict(self.e2e))
+            s = self.seg_infos.e2e_lbl()
+            yield(s,dict(self.e2e))
         for s in self.segs:
             yield(str(s[0]),dict(s[1]))
+    
+    def e2e_lbl(self):
+	    pass
 
     def set_min_bw(self):
         min_bw = None
