@@ -71,11 +71,14 @@ def loop(args):
             try:
                 tab = load_new_chunks(agg,args)
                 if tab:
-                    r = GlobalStats(sort_packets_ts(tab))
+                    r = GlobalStats(tab)
+                    #r = GlobalStats(sort_packets_ts(tab))
+                    #print(str(agg))
+                    #print("===============================")
                     #r = GlobalStats(tab)
-                    logger.info("sent N°"+str(r.chunk_id))
+                    #logger.info("sent N°"+str(r.chunk_id))
                     #print("sent N°"+str(r.chunk_id))
-                    #print(r)
+		    #print(r)
                     print(r.to_json())
                     send_msg(r.to_json())
                 update_current_chunks(file_data,agg,args)

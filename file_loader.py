@@ -37,7 +37,7 @@ def check_file(filename):
                     if i > last_line:
                         print(line.strip("\n"))
                         last_line += 1
-            time.sleep(SLEEP_TIME)
+            #time.sleep(SLEEP_TIME)
         except (KeyboardInterrupt, SystemExit):
             raise
         except FileNotFoundError:

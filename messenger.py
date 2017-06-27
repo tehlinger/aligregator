@@ -2,12 +2,15 @@
 import pika
 import time
 
+#QUEUE = 'mode2results' 
+QUEUE = 'tibo' 
+
 
 def send_msg(m):
     connection = pika.BlockingConnection(pika.ConnectionParameters('172.16.0.21'))
     channel = connection.channel()
-    channel.queue_declare(queue='mode2results',durable=False)
+    channel.queue_declare(queue=QUEUE,durable=False)
     channel.basic_publish(exchange='',
-                          routing_key='tibo',
+                          routing_key=QUEUE,
                           body=m)
     connection.close()

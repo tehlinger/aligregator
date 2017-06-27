@@ -73,7 +73,8 @@ class FlowStats(object):
         return self.e2e == other.e2e
 
     def __iter__(self):
-        yield("e2e",dict(self.e2e))
+        if(self.e2e != None):
+            yield("e2e",dict(self.e2e))
         for s in self.segs:
             yield(str(s[0]),dict(s[1]))
 
@@ -107,7 +108,7 @@ class SegStats:
                     self.incoherent_stats else "\t\t\tIncoherent flow in this chunk."
 
     def __iter__(self):
-        yield("parent","e2e" if not self.is_e2e else "None")
+        yield("p_id","e2e" if not self.is_e2e else "0")
         yield("j",dict(self.jit_stats))
         yield("d",dict(self.del_stats))
         yield("l",dict(self.loss_stats))
