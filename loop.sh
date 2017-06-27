@@ -5,4 +5,4 @@
 #cp ../old_packets/c_2017-06-26_15:49.dat ~/scripts/c.dat
 #cp ../old_packets/b_2017-06-26_15:49.dat ~/scripts/b.dat
 #cp ../old_packets/a_2017-06-26_15:49.dat ~/scripts/a.dat
-python3 main.py -f ../../../scripts/a.dat  ../../../scripts/c.dat ../../../scripts/b.dat -l -i A B C
+python3 main.py -f ../../../scripts/b.dat  ../../../scripts/a.dat ../../../scripts/c.dat -l -i A B C

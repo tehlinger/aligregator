@@ -36,16 +36,10 @@ def get_swap_instructions(unsorted_tab):
     return SwapInstructions(result)
 
 def best_guess(packets):
-    total = -1
-    top_candidate = None
-    swap_occurences =  analyze_order(packets)
-    for s, n in swap_occurences.items():
-        if n > total:
-            total = n
-            top_candidate = list(s)
-    return top_candidate
+    swap_occurences =  count_occurence_for_each_order(packets)
+    return most_frequent_order(swap_occurences)
 
-def analyze_order(packets):
+def count_occurence_for_each_order(packets):
     dict_of_occurence_numbers = {}
     stop = False
     for p_id,p in packets.items():
@@ -60,6 +54,14 @@ def analyze_order(packets):
         if stop:
            return dict_of_occurence_numbers
     return dict_of_occurence_numbers
+
+def most_frequent_order(swap_occurences):
+    total = -1
+    for s, n in swap_occurences.items():
+        if n > total:
+            total = n
+            top_candidate = list(s)
+    return top_candidate
 
 class SwapInstructions(object):
 
