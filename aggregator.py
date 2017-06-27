@@ -18,10 +18,11 @@ class Aggregator(object):
 
     def get_next_chunk_to_load_id(self):
         for l in self.metadata.lines:
-            if l.is_complete() and l.has_never_been_loaded():
+            if l.has_never_been_loaded() and l.is_complete():
                 r = l.index
                 #self.metadata.delete(l)
                 l.mark_as_loaded()
+                del l.values
                 return r
         return None
 
@@ -93,7 +94,7 @@ class ChunksMetadata(object):
     def str_lines(self):
         r = ""
         for l in self.lines:
-            r +=str(l)+"\n"
+            r +="\t"+str(l)+"\n"
         return r
 
     def has_same_lines_than(self,other):
@@ -126,8 +127,9 @@ class Line:
                 self.values == other.values
 
     def __str__(self):
-        s = "NO" if not self.already_loaded else "YES"
-        return "[LOADED : "+s+" "+str(self.index)+" : "+str(self.values) +" ]"
+        l = "None" if not hasattr(self,"values") else str(self.values)
+        s = "NO " if not self.already_loaded else "YES"
+        return "[ID : "+str(self.index)+" - Loaded : "+s+" "+" Values : "+ l +" ]"
 
     def set_true_at(self,i):
         if i < len(self.values):
@@ -137,6 +139,8 @@ class Line:
                     +str(i))
 
     def is_complete(self):
+        if not hasattr(self,'values'):
+            return False
         for state in self.values:
             if not state:
                 return False

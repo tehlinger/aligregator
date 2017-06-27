@@ -342,19 +342,19 @@ class TestAggregator(unittest.TestCase):
 
     def test_get_id_alters_agg(self):
         files1 =\
-                ["data/test_agg/pc1_agg1.dat","data/test_agg/pc1_agg1.dat","data/test_agg/pc1_agg1.dat"]
+                ["data/test_agg/pc1_agg1.dat","data/test_agg/pc2_agg1.dat","data/test_agg/pc3_agg1.dat"]
         files2 =\
-                ["data/test_agg/pc1_agg2.dat","data/test_agg/pc1_agg2.dat","data/test_agg/pc1_agg2.dat"]
+                ["data/test_agg/pc1_agg2.dat","data/test_agg/pc2_agg2.dat","data/test_agg/pc3_agg2.dat"]
         agg = Aggregator(["pc1","pc2","pc3"])
         agg.update_files_meta(files1)
         self.assertEqual(len(agg.metadata.lines),4)
         agg.update_files_meta(files2)
         self.assertEqual(len(agg.metadata.lines),7)
-        for i in range(5):
+        for i in range(4):
             a = agg.get_next_chunk_to_load_id()
         self.assertEqual(agg.metadata.lines[0].already_loaded, True)
-        self.assertEqual(agg.metadata.lines[3].already_loaded, True)
-        self.assertEqual(agg.metadata.lines[4].already_loaded, True)
+        self.assertEqual(agg.metadata.lines[2].already_loaded, False)
+        self.assertEqual(agg.metadata.lines[5].already_loaded, False)
         self.assertEqual(agg.metadata.lines[6].already_loaded, False)
 
 
