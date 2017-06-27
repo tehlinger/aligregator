@@ -294,7 +294,9 @@ class Packet:
             if strictly_increasing(result.get_ts_as_list()):
                 return result
             else :
-                return None
+		#BUG : does currently not swap FIRST and LAST time
+                #print("Not increasing : "+str(result))
+                return result 
         else:
                 raise ValueError(str(instructions)+' instructions'\
                         +' do not apply with '+str(self))

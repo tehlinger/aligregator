@@ -6,6 +6,7 @@ from collections import OrderedDict
 
 def sort_packets_ts(unsorted_tab):
     swap_instructions = get_swap_instructions(unsorted_tab)
+    #print("SWAP : "+str(swap_instructions))
     return apply_swaps(swap_instructions,unsorted_tab)
 
 def apply_swaps(swap_instructions,unsorted_tab):
@@ -20,11 +21,12 @@ def apply_swaps(swap_instructions,unsorted_tab):
 def apply_swap_to_flow(instructions,flow):
     result = OrderedDict()
     for p_id,p in flow.items():
-       sorted_p = p.swap(instructions)
-       if sorted_p == None:
-           return None
-       else:
-        result[p_id]=sorted_p
+        sorted_p = p.swap(instructions)
+        if sorted_p == None:
+            #print("No swap instruction")
+            return None
+        else:
+            result[p_id]=sorted_p
     return result
 
 def get_swap_instructions(unsorted_tab):

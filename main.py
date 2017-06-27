@@ -33,17 +33,18 @@ def loop(args):
         is_running = True 
 
         #INFINITE LOOP
-        agg = keep_trying_to_load(args)
+        agg = keep_trying_to_load(args,agg)
         
         file_data = init_file_data(args)
         while is_running:
             try:
                 tab = load_new_chunks(agg,args)
                 if tab:
-                    r = GlobalStats(tab)
-                    #r = GlobalStats(sort_packets_ts(tab))
-                    print(r.to_json())
-                    send_msg(r.to_json())
+                    #r = GlobalStats(tab)
+                    tmp = sort_packets_ts(tab)
+                    r = GlobalStats(tmp)
+                    print(r)
+                    #send_msg(r.to_json())
                 check_files_and_load_new_chunks(file_data,agg,args)
                 sleep (SLEEP_TIME)
             except FileNotFoundError :
@@ -78,7 +79,7 @@ def load_stats_once(args):
         tab = sort_packets_ts(r)
         return GlobalStats(tab)
 
-def keep_trying_to_load(args):
+def keep_trying_to_load(args,agg):
         file_not_ok = True 
         while file_not_ok:
             try:

@@ -132,10 +132,11 @@ class Line:
         return "[ID : "+str(self.index)+" - Loaded : "+s+" "+" Values : "+ l +" ]"
 
     def set_true_at(self,i):
-        if i < len(self.values):
+        if hasattr(self,"values") and i < len(self.values):
             self.values[i] = True
         else:
-            raise ValueError('Could not add element : width smaller than '\
+            if hasattr(self,"values"):
+                raise ValueError('Could not add element : width smaller than '\
                     +str(i))
 
     def is_complete(self):
