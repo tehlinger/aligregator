@@ -27,7 +27,8 @@ class GlobalStats:
         yield('bds',self.bounds)
         yield('id',self.chunk_id)
         for flow_id, stats in self.flows_stats.items():
-            yield(str(flow_id),dict(stats))
+            yield('f',dict([('id',str(flow_id)),('content',dict(stats))]))
+            #yield(str(flow_id),dict(stats))
 
     def calc_flows_stats(self,tab):
         for flow_id, data in tab.data.items():
