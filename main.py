@@ -24,6 +24,35 @@ import pprint
 
 logger = init_logger()
 
+def loop(args):
+    try:
+        file_not_ok = True
+        agg = Aggregator(args.ids)
+        tab = None
+        file_data = None
+        is_running = True 
+
+        #INFINITE LOOP
+        agg = keep_trying_to_load(args)
+        
+        file_data = init_file_data(args)
+        while is_running:
+            try:
+                tab = load_new_chunks(agg,args)
+                if tab:
+                    r = GlobalStats(tab)
+                    #r = GlobalStats(sort_packets_ts(tab))
+                    print(r.to_json())
+                    send_msg(r.to_json())
+                check_files_and_load_new_chunks(file_data,agg,args)
+                sleep (SLEEP_TIME)
+            except FileNotFoundError :
+                print("File not found")
+                sleep(1)
+    except (KeyboardInterrupt, SystemExit):
+        print("\nApplication interrupted")
+        #logger.critical("Application interrupted")
+
 def get_parser():
     parser = argparse.ArgumentParser (description='Load chunks of given files')
     parser.add_argument("-f", "--files",dest='files',action="store",nargs='+' )
@@ -49,13 +78,8 @@ def load_stats_once(args):
         tab = sort_packets_ts(r)
         return GlobalStats(tab)
 
-def loop(args):
-    try:
-        file_not_ok = True
-        agg = Aggregator(args.ids)
-        tab = None
-        file_data = None
-        is_running = False
+def keep_trying_to_load(args):
+        file_not_ok = True 
         while file_not_ok:
             try:
                 file_data = init_file_data(args)
@@ -65,32 +89,10 @@ def loop(args):
                 sleep(1)
             else:
                 file_not_ok = False 
-                is_running = True
                 print("Loop started.")
-        while is_running:
-            try:
-                tab = load_new_chunks(agg,args)
-                if tab:
-                    r = GlobalStats(tab)
-                    #r = GlobalStats(sort_packets_ts(tab))
-                    #print(str(agg))
-                    #print("===============================")
-                    #r = GlobalStats(tab)
-                    #logger.info("sent N°"+str(r.chunk_id))
-                    #print("sent N°"+str(r.chunk_id))
-		    #print(r)
-                    print(r.to_json())
-                    send_msg(r.to_json())
-                update_current_chunks(file_data,agg,args)
-                sleep (SLEEP_TIME)
-            except FileNotFoundError :
-                print("File not found")
-                sleep(1)
-    except (KeyboardInterrupt, SystemExit):
-        print("\nApplication interrupted")
-        #logger.critical("Application interrupted")
+                return agg
 
-def update_current_chunks(file_data,agg,args):
+def check_files_and_load_new_chunks(file_data,agg,args):
     change_detected = check_all_files(file_data)
     if change_detected:
         agg.update_files_meta(args.files)
