@@ -29,9 +29,9 @@ class GlobalStats:
     #Iterator used for to_json() method
     def __iter__(self):
         yield('bds',self.bounds)
-        yield('id',self.chunk_id)
+        yield('c_id',self.chunk_id)
         for flow_id, stats in self.flows_stats.items():
-            yield('f',dict([('id',str(flow_id)),('content',dict(stats))]))
+            yield('f',dict([('s_id',str(flow_id)),('content',dict(stats))]))
             #yield(str(flow_id),dict(stats))
 
     def calc_flows_stats(self,tab):
@@ -78,12 +78,19 @@ class FlowStats(object):
         return self.e2e == other.e2e
 
     def __iter__(self):
+        i = 0
         if(self.e2e != None):
             s = self.seg_infos.e2e_lbl()
-            yield(s,dict(self.e2e))
+            #yield(s,dict(self.e2e))
+            yield("Seg"+str(i),dict([("s_id"\
+                ,s),("s_content",dict(self.e2e))]))
+            i += 1
         for s in self.segs:
-            yield(str(s[0]),dict(s[1]))
-    
+            #yield(str(s[0]),dict(s[1]))
+            yield("Seg"+str(i),dict([("s_id",str(s[0])),\
+                    ("content",dict(s[1]))]))
+            i += 1
+
     def e2e_lbl(self):
 	    pass
 
