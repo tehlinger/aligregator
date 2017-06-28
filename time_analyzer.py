@@ -56,6 +56,7 @@ def count_occurence_for_each_order(packets):
     return dict_of_occurence_numbers
 
 def most_frequent_order(swap_occurences):
+    top_candidate = None
     total = -1
     for s, n in swap_occurences.items():
         if n > total:

@@ -40,11 +40,12 @@ def loop(args):
             try:
                 tab = load_new_chunks(agg,args)
                 if tab:
-                    #r = GlobalStats(tab)
-                    tmp = sort_packets_ts(tab)
-                    r = GlobalStats(tmp)
+                    r = GlobalStats(tab)
+                    #tmp = sort_packets_ts(tab)
+                    #r = GlobalStats(tmp)
                     #print(r)
                     print(r.to_json())
+                    print("\n================================\n")
                     #print(r.to_printable_json())
                     #send_msg(r.to_json())
                 check_files_and_load_new_chunks(file_data,agg,args)
