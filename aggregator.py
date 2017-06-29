@@ -76,7 +76,7 @@ class ChunksMetadata(object):
                         return Action.LOAD
                     else:
                         return Action.IDLE
-            new_line = Line(len(self.lines),self.width)
+            new_line = Line(line,self.width)
             new_line.set_true_at(col)
             self.lines.append(new_line)
             return Action.IDLE

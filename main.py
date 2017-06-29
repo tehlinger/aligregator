@@ -25,6 +25,7 @@ import pprint
 logger = init_logger()
 
 def loop(args):
+    i = 0
     try:
         file_not_ok = True
         agg = Aggregator(args.ids)
@@ -39,19 +40,30 @@ def loop(args):
             try:
                 tab = load_new_chunks(agg,args)
                 if tab:
-                    r = GlobalStats(tab)
-                    #tmp = sort_packets_ts(tab)
-                    #r = GlobalStats(tmp)
+                    i += 1
+                    #r = GlobalStats(tab)
+                    tmp = sort_packets_ts(tab)
+                    r = GlobalStats(tmp)
+                    f = next(iter (r.flows_stats.values()))
+                    if i % 100 == 0:
+                        i = 0
+                        logger.info("E2E : "+str(f.e2e.del_stats.avg))
                     #print(r)
                     print(r.to_json())
                     print("\n================================\n")
                     #print(r.to_printable_json())
-                    #send_msg(r.to_json())
+                    send_msg(r.to_json())
                 check_files_and_load_new_chunks(file_data,agg,args)
                 sleep (SLEEP_TIME)
             except FileNotFoundError :
                 print("File not found")
                 sleep(1)
+            except  KeyboardInterrupt:
+                raise
+            except Exception as e:
+                logger.critical(e)
+                print(e)
+                time.sleep(0.1)
     except (KeyboardInterrupt, SystemExit):
         print("\nApplication interrupted")
         #logger.critical("Application interrupted")
@@ -95,6 +107,7 @@ def keep_trying_to_load(args,agg):
             else:
                 file_not_ok = False 
                 print("Loop started.")
+                logger.critical("Loop started.")
                 return agg
 
 def check_files_and_load_new_chunks(file_data,agg,args):

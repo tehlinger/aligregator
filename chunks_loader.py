@@ -13,7 +13,6 @@ def load_tab(f_names,chunk_ids,agent_ids=None):
         tab = load_chunks(tab,f_names[1],chunk_ids,Chunk_position.LAST)
         for f in f_names[2:]:
                 tab = load_chunks(tab,f,chunk_ids,Chunk_position.INTERMEDIATE)
-        #print("REEESSSULLTT:\n"+str(tab))
         return tab
 
 def init_tab(chunk_ids,f_names,agent_ids):

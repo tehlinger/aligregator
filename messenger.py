@@ -2,8 +2,8 @@
 import pika
 import time
 
-#QUEUE = 'mode2results' 
-QUEUE = 'tibo' 
+QUEUE = 'mode2results' 
+#QUEUE = 'tibo' 
 
 
 def send_msg(m):
