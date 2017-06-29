@@ -53,9 +53,16 @@ def load_all_chunk_metadatas(filename):
 
 def is_valid(line):
     l = line.split('|')
+    if len(l) < 3:
+        return False
     try:
         x = float(l[2])
-    except:
+    except ValueError as e:
+        try:
+            x = float(l[3])
+            return len(l) >= 3 and l[1] and l[2]
+        except:
+            pass
         #If the timestamp field of the string is not a float, then
         #the line is invalis
         return False
@@ -94,16 +101,30 @@ class Chunk:
                     break
                 else:
                     elements = line.rstrip().split("|")
-                    f_id = elements[0]
-                    p_id = elements[1]
-                    ts = float(elements[2])
-                    p_size = None if len(elements) < 4 else int(elements[3])
-                    if f_id not in self.data:
-                        self.data[f_id] = OrderedDict()
-                    if not p_size:
-                        self.data[f_id][p_id] = ts
+                    has_f_id = len(elements) == 5
+                    s_id = elements[0]
+                    if not has_f_id:
+                        p_id = elements[1]
+                        ts = float(elements[2])
+                        p_size = None if len(elements) < 4 else int(elements[3])
+                        if s_id not in self.data:
+                            self.data[s_id] = OrderedDict()
+                        if not p_size:
+                            self.data[s_id][p_id] = ts
+                        else:
+                            self.data[s_id][p_id] = [ts,p_size]
                     else:
-                        self.data[f_id][p_id] = [ts,p_size]
+                        f_id = str(elements[1])
+                        print("FID : "+f_id)
+                        p_id = elements[2]
+                        ts = float(elements[3])
+                        p_size =  int(elements[4])
+                        if s_id not in self.data:
+                            self.data[s_id] = OrderedDict()
+                        if not p_size:
+                            self.data[s_id][p_id] = ts
+                        else:
+                            self.data[s_id][p_id] = [ts,p_size]
 
 
 class Tab:

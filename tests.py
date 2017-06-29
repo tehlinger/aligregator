@@ -14,6 +14,18 @@ def print_debug(a,b):
     print("================  GOT  ==============")
     print(b)
 
+class TestFlowsLoad(unittest.TestCase):
+
+    def test_load_chunk_f_id(self):
+        chunk0 = load_chunk(0,"data/f_pcFoo.dat")
+        chunk1 = load_chunk(1,"data/f_pcFoo.dat")
+
+        self.assertIsNotNone(chunk0.data['100'])
+        self.assertIsNotNone(chunk1.data['100'])
+        self.assertIsNotNone(chunk0.data['200'])
+        self.assertIsNotNone(chunk1.data['200'])
+
+
 class TestChunkLoad(unittest.TestCase):
 
     def test_load_chunk_bounds(self):
