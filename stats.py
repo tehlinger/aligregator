@@ -37,18 +37,26 @@ class GlobalStats:
                 #yield(str(flow_id),dict(stats))
         else:
             new_dic = self.organized_per_flow()
+            i = 0
             for s_id, flows in new_dic.items():
-                yield('s',dict([('s_id',str(s_id)),('content',self.list_flows(flows))]))
+                yield('s'+str(i),dict([('s_id',str(s_id)),('content',self.list_flows(flows))]))
+                i+=1
 
     def organized_per_flow(self):
         result = {}
+        for flow_id, stats in self.flows_stats.items():
+            s_id = stats.s_id
+            f_id = stats.f_id
+            if f_id  not in result:
+                result[f_id] = {}
+            result[f_id][s_id] = stats
         return result
 
     def list_flows(self,flows):
         result = { }
         i = 0
         for f_id, stats in flows.items():
-            result['f'+str(i)] = dict([('f_id',str(flow_id)),('content',dict(stats))])
+            result['f'+str(i)] = dict([('f_id',str(f_id)),('content',dict(stats))])
             i += 1
         return result
 
@@ -74,6 +82,10 @@ class FlowStats(object):
         self.segs = []
         self.seg_infos = n_seg_infos
         if data:
+            if "s_id" in data:
+               self.has_flows = True
+               self.s_id = data["s_id"]
+               self.f_id = data["f_id"]
             self.e2e = SegStats(data,e2e=True)
             self.segs = []
             if self.seg_infos:
@@ -86,10 +98,15 @@ class FlowStats(object):
 
     def __str__(self):
         r = ""
+        i = ""
+        if self.has_flows:
+            i = "\t\t"
+            i += "[S_ID "+str(self.s_id)+"]\n"
+            i += "\t\t[F_ID "+str(self.f_id)+"]\n"
         for seg in self.segs:
             r += "\t\t["+seg[0]+"]\n"+str(seg[1])+\
             "\n"
-        return "\n\t\t[E2E] :\n "+str(self.e2e)+"\n"+r
+        return i+"\n\t\t[E2E] :\n "+str(self.e2e)+"\n"+r
         #return "\n[E2E] : "+str(self.e2e)+"\n"+r
 
     def __eq__(self,other):
@@ -100,12 +117,12 @@ class FlowStats(object):
         if(self.e2e != None):
             s = self.seg_infos.e2e_lbl()
             #yield(s,dict(self.e2e))
-            yield("Seg"+str(i),dict([("s_id"\
+            yield("Seg"+str(i),dict([("seg_id"\
                 ,s),("s_content",dict(self.e2e))]))
             i += 1
         for s in self.segs:
             #yield(str(s[0]),dict(s[1]))
-            yield("Seg"+str(i),dict([("s_id",str(s[0])),\
+            yield("Seg"+str(i),dict([("seg_id",str(s[0])),\
                     ("content",dict(s[1]))]))
             i += 1
 

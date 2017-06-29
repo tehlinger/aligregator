@@ -28,6 +28,8 @@ def apply_swap_to_flow(instructions,flow):
                 return None
             else:
                 result[p_id]=sorted_p
+        else:
+            result[p_id] = p
     return result
 
 def get_swap_instructions(unsorted_tab):

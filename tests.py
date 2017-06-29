@@ -68,8 +68,12 @@ class TestFlowsLoad(unittest.TestCase):
         tab.add_chunk(chunk11,Chunk_position.LAST)
         tab.segs = Seg_manager(["0","1","2"])
         calculated = GlobalStats(tab)
-        print(calculated)
         d = dict(calculated)
+        self.assertTrue("s0" in d)
+        self.assertTrue("s1" in d)
+        self.assertTrue(d["s0"]["s_id"] == "100")
+        self.assertTrue("A:B" in d["s0"]["s_id"])
+        self.assertTrue(d["s1"]["s_id"] == "200")
         print(d)
 
 

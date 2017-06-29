@@ -13,6 +13,7 @@ def load_tab(f_names,chunk_ids,agent_ids=None):
         tab = load_chunks(tab,f_names[1],chunk_ids,Chunk_position.LAST)
         for f in f_names[2:]:
                 tab = load_chunks(tab,f,chunk_ids,Chunk_position.INTERMEDIATE)
+        #print("REEESSSULLTT:\n"+str(tab))
         return tab
 
 def init_tab(chunk_ids,f_names,agent_ids):
@@ -20,7 +21,8 @@ def init_tab(chunk_ids,f_names,agent_ids):
         raise NameError('Need at least two files')
     if len(chunk_ids) < 1:
         raise NameError('Need at least one chunk id')
-    return Tab(load_chunk(chunk_ids[0],f_names[0]),Chunk_position.FIRST,agent_ids)
+    result = Tab(load_chunk(chunk_ids[0],f_names[0]),Chunk_position.FIRST,agent_ids)
+    return result
 
 def load_chunks(tab,f_name,chunk_ids,position):
     for i in chunk_ids:
@@ -175,6 +177,8 @@ class Tab:
             r = ""
             if hasattr(self,'bounds'):
                 r +="["+str(self.bounds[0])+";"+str(self.bounds[1])+"]\n"
+            if self.has_flows():
+                r +="HAS FLOWS\n"
             if hasattr(self,'chunk_id'):
                 r +="[Chunk ID : "+self.chunk_id+"]\n"
             r+="\nSegments:"+str(self.segs)+"\n"
@@ -234,6 +238,12 @@ class Tab:
 
     def merge_flows(self,flow_id,packets,chunk_position):
         flow =self.data[flow_id]
+        if self.has_flows():
+            line = flow_id.split("|")
+            f_id = line[0]
+            s_id = line[1]
+            self.data[flow_id]["s_id"]=s_id
+            self.data[flow_id]["f_id"]=f_id
         for p_id, ts in packets.items():
             add_ts(flow,p_id,ts,chunk_position)
 

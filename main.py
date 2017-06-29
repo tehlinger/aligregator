@@ -34,7 +34,6 @@ def loop(args):
 
         #INFINITE LOOP
         agg = keep_trying_to_load(args,agg)
-        
         file_data = init_file_data(args)
         while is_running:
             try:
@@ -80,7 +79,9 @@ def generate_pc_names(args):
 def load_stats_once(args):
         r = load_tab(args.files, args.chunks,args.ids)
         tab = sort_packets_ts(r)
-        return GlobalStats(tab)
+        #print(tab)
+        r = GlobalStats(tab)
+        return r
 
 def keep_trying_to_load(args,agg):
         file_not_ok = True 
