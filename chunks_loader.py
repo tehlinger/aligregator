@@ -114,11 +114,12 @@ class Chunk:
                         else:
                             self.data[s_id][p_id] = [ts,p_size]
                     else:
+                        self.has_f_id = True
                         f_id = str(elements[1])
-                        print("FID : "+f_id)
                         p_id = elements[2]
                         ts = float(elements[3])
                         p_size =  int(elements[4])
+                        s_id = s_id+"|"+f_id
                         if s_id not in self.data:
                             self.data[s_id] = OrderedDict()
                         if not p_size:
@@ -135,6 +136,11 @@ class Tab:
         else:
             if not hasattr(self,'data'):
                 self.data = {}
+            if hasattr(chunk,'has_f_id'):
+                self.has_f_id = True
+            else:
+                if not hasattr(self,'has_flows'):
+                    self.has_f_id = False
             self.chunk_id = chunk.id if chunk.id else None
             self.bounds = None
             self.add_first_chunk(chunk,chunk_position)
@@ -154,6 +160,12 @@ class Tab:
                         if ts != other.data[flow_id][p_id]:
                             return False
         return True
+
+    def has_flows(self):
+        if hasattr(self,'has_f_id'):
+            return self.has_f_id
+        else:
+            return False
 
     def size(self):
 	    return len(self.data)
@@ -211,6 +223,12 @@ class Tab:
 
     def add_new_flow(self,flow_id,packets,chunk_position):
         self.data[flow_id] = OrderedDict()
+        if self.has_flows():
+            line = flow_id.split("|")
+            f_id = line[0]
+            s_id = line[1]
+            self.data[flow_id]["s_id"]=s_id
+            self.data[flow_id]["f_id"]=f_id
         for p_id, ts in packets.items():
             self.data[flow_id][p_id] = new_ts(ts)
 

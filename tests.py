@@ -17,13 +17,60 @@ def print_debug(a,b):
 class TestFlowsLoad(unittest.TestCase):
 
     def test_load_chunk_f_id(self):
-        chunk0 = load_chunk(0,"data/f_pcFoo.dat")
-        chunk1 = load_chunk(1,"data/f_pcFoo.dat")
+        chunk00 = load_chunk(0,"data/f_pcFoo.dat")
+        chunk01 = load_chunk(1,"data/f_pcFoo.dat")
+        chunk10 = load_chunk(0,"data/f_pcBar.dat")
+        chunk11 = load_chunk(1,"data/f_pcBar.dat")
+        self.assertIsNotNone(chunk00.data['100|A:B'])
+        self.assertIsNotNone(chunk00.data['100|B:A'])
+        self.assertIsNotNone(chunk00.data['200|A:B'])
+        self.assertIsNotNone(chunk00.data['100|B:A'])
+        self.assertIsNotNone(chunk01.data['100|A:B'])
+        self.assertIsNotNone(chunk01.data['100|B:A'])
+        self.assertIsNotNone(chunk01.data['200|A:B'])
+        self.assertIsNotNone(chunk01.data['100|B:A'])
+        self.assertIsNotNone(chunk10.data['100|A:B'])
+        self.assertIsNotNone(chunk10.data['100|B:A'])
+        self.assertIsNotNone(chunk10.data['200|A:B'])
+        self.assertIsNotNone(chunk10.data['100|B:A'])
+        self.assertIsNotNone(chunk11.data['100|A:B'])
+        self.assertIsNotNone(chunk11.data['100|B:A'])
+        self.assertIsNotNone(chunk11.data['200|A:B'])
+        self.assertIsNotNone(chunk11.data['100|B:A'])
 
-        self.assertIsNotNone(chunk0.data['100'])
-        self.assertIsNotNone(chunk1.data['100'])
-        self.assertIsNotNone(chunk0.data['200'])
-        self.assertIsNotNone(chunk1.data['200'])
+    def test_tab_knows_has_flow(self):
+        chunk00 = load_chunk(0,"data/f_pcFoo.dat")
+        chunk10 = load_chunk(0,"data/f_pcBar.dat")
+        chunk11 = load_chunk(0,"data/f_pcQux.dat")
+        tab = Tab(chunk00,Chunk_position.FIRST)
+        tab.add_chunk(chunk10,Chunk_position.INTERMEDIATE)
+        tab.add_chunk(chunk11,Chunk_position.LAST)
+        self.assertEqual(len(tab.data.keys()),4)
+        self.assertTrue(tab.has_flows())
+
+    def test_stats_for_flows(self):
+        chunk00 = load_chunk(0,"data/f_pcFoo.dat")
+        chunk10 = load_chunk(0,"data/f_pcBar.dat")
+        chunk11 = load_chunk(0,"data/f_pcQux.dat")
+        tab = Tab(chunk00,Chunk_position.FIRST)
+        tab.add_chunk(chunk10,Chunk_position.INTERMEDIATE)
+        tab.add_chunk(chunk11,Chunk_position.LAST)
+        tab.segs = Seg_manager(["0","1","2"])
+        calculated = GlobalStats(tab)
+        self.assertTrue(calculated.has_flows)
+
+    def test_stats_with_flows_to_dict(self):
+        chunk00 = load_chunk(0,"data/f_pcFoo.dat")
+        chunk10 = load_chunk(0,"data/f_pcBar.dat")
+        chunk11 = load_chunk(0,"data/f_pcQux.dat")
+        tab = Tab(chunk00,Chunk_position.FIRST)
+        tab.add_chunk(chunk10,Chunk_position.INTERMEDIATE)
+        tab.add_chunk(chunk11,Chunk_position.LAST)
+        tab.segs = Seg_manager(["0","1","2"])
+        calculated = GlobalStats(tab)
+        print(calculated)
+        d = dict(calculated)
+        print(d)
 
 
 class TestChunkLoad(unittest.TestCase):
@@ -55,7 +102,6 @@ class TestChunkLoad(unittest.TestCase):
 
     def test_init_tab(self):
         tab = Tab(self.chunkfoo_0,Chunk_position.FIRST)
-
         self.assertEqual(tab,self.init_tab)
 
     def test_merge_tab(self):

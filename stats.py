@@ -15,6 +15,7 @@ class GlobalStats:
             self.bounds = None
             self.flows_stats = {}
         else:
+            self.has_flows = tab.has_flows()
             self.bounds = tab.bounds
             self.chunk_id = tab.chunk_id
             self.calc_flows_stats(tab)
@@ -30,9 +31,26 @@ class GlobalStats:
     def __iter__(self):
         yield('bds',self.bounds)
         yield('c_id',self.chunk_id)
-        for flow_id, stats in self.flows_stats.items():
-            yield('f',dict([('s_id',str(flow_id)),('content',dict(stats))]))
-            #yield(str(flow_id),dict(stats))
+        if not self.has_flows:
+            for flow_id, stats in self.flows_stats.items():
+                yield('f',dict([('s_id',str(flow_id)),('content',dict(stats))]))
+                #yield(str(flow_id),dict(stats))
+        else:
+            new_dic = self.organized_per_flow()
+            for s_id, flows in new_dic.items():
+                yield('s',dict([('s_id',str(s_id)),('content',self.list_flows(flows))]))
+
+    def organized_per_flow(self):
+        result = {}
+        return result
+
+    def list_flows(self,flows):
+        result = { }
+        i = 0
+        for f_id, stats in flows.items():
+            result['f'+str(i)] = dict([('f_id',str(flow_id)),('content',dict(stats))])
+            i += 1
+        return result
 
     def calc_flows_stats(self,tab):
         for flow_id, data in tab.data.items():
@@ -150,11 +168,20 @@ class SegStats:
 
     def all_stats(self,flow_data,start=-1,stop=-1,seg_infos=None):
         analyzer = StatsCalculator(start,stop)
-
+        has_flows = False
         for p in flow_data.items():
-            analyzer.add_packet(p)
-	    
+            if p[0] != "s_id" and p[0] != "f_id":
+                analyzer.add_packet(p)
+            else:
+                has_flows = True
+                if p[0] == "s_id":
+                    s_id = p[1]
+                if p[0] == "f_id":
+                    f_id = p[1]
         result = analyzer.summary()
+        if has_flows:
+            result["s_id"] = s_id
+            result["f_id"] = f_id
         return result
 
 class CommonStats(object):
@@ -219,12 +246,17 @@ class JitterStats(CommonStats):
         yield("md",self.med)
 
      def calc(self,jitters):
-         array = np.array(jitters["all"])
          self.min = jitters["min"]
          self.max = jitters["max"]
-         self.avg = np.average(array)
-         self.var = np.var(array)
-         self.med = np.median(array)
+         if len(jitters["all"]) > 0:
+            array = np.array(jitters["all"])
+            self.avg = np.average(array)
+            self.var = np.var(array)
+            self.med = np.median(array)
+         else:
+            self.avg =0
+            self.var =0
+            self.med =0
 
 class BwStats(object):
      def __init__(self,n_total_size=0,n_total_time=1):

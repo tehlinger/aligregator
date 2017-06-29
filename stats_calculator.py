@@ -78,7 +78,7 @@ class StatsCalculator(object):
     #                self.jitters.append(new_jit)
     #            self.last_delay = new_delay
     #        except NameError:
-    #            return 
+    #            return
 
 
     def summary(self):

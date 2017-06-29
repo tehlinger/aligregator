@@ -21,12 +21,13 @@ def apply_swaps(swap_instructions,unsorted_tab):
 def apply_swap_to_flow(instructions,flow):
     result = OrderedDict()
     for p_id,p in flow.items():
-        sorted_p = p.swap(instructions)
-        if sorted_p == None:
-            #print("No swap instruction")
-            return None
-        else:
-            result[p_id]=sorted_p
+        if p_id != "s_id" and p_id != "f_id":
+            sorted_p = p.swap(instructions)
+            if sorted_p == None:
+                #print("No swap instruction")
+                return None
+            else:
+                result[p_id]=sorted_p
     return result
 
 def get_swap_instructions(unsorted_tab):
@@ -43,16 +44,17 @@ def count_occurence_for_each_order(packets):
     dict_of_occurence_numbers = {}
     stop = False
     for p_id,p in packets.items():
-        if p.has_no_loss():
-          swaps = p.right_order()
-          if swaps != None:
-            #stop = True
-            if tuple(swaps) in dict_of_occurence_numbers:
-                dict_of_occurence_numbers[tuple(swaps)] += 1
-            else:
-                dict_of_occurence_numbers[tuple(swaps)] = 1
-        if stop:
-           return dict_of_occurence_numbers
+        if p_id != "s_id" and p_id != "f_id":
+            if p.has_no_loss():
+              swaps = p.right_order()
+              if swaps != None:
+                #stop = True
+                if tuple(swaps) in dict_of_occurence_numbers:
+                    dict_of_occurence_numbers[tuple(swaps)] += 1
+                else:
+                    dict_of_occurence_numbers[tuple(swaps)] = 1
+            if stop:
+               return dict_of_occurence_numbers
     return dict_of_occurence_numbers
 
 def most_frequent_order(swap_occurences):
