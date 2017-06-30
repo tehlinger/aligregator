@@ -27,6 +27,8 @@ def load_chunks(tab,f_name,chunk_ids,position):
     for i in chunk_ids:
         chunk = load_chunk(i,f_name)
         tab.add_chunk(chunk,position)
+        #if chunk != None:
+        #    tab.add_chunk(chunk,position)
     return tab
 
 def load_chunk(chunk_id,filename):
@@ -309,7 +311,8 @@ class Packet:
     def delay_between(self,start=-1,stop=-1):
         if self.is_end_to_end(start,stop):
             if not self.first or not self.last:
-                raise NameError('Packet missing a timestamp : \n'+str(self))
+                #raise NameError('Packet missing a timestamp : \n'+str(self))
+                return None
             else:
                 result = float(self.last) - float(self.first)
                 return result

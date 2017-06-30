@@ -67,10 +67,10 @@ def loop(args):
                 sleep(1)
             except  KeyboardInterrupt:
                 raise
-            #except Exception as e:
-            #    logger.critical(e)
-            #    print(e)
-            #    time.sleep(0.1)
+            except Exception as e:
+                logger.critical(e)
+                print(e)
+                time.sleep(0.1)
     except (KeyboardInterrupt, SystemExit):
         print("\nApplication interrupted")
         #logger.critical("Application interrupted")
@@ -124,8 +124,12 @@ def check_files_and_load_new_chunks(file_data,agg,args):
 
 def load_new_chunks(agg,args):
     chunk_id = agg.get_next_chunk_to_load_id()
+    ids_list = [chunk_id]
+#    if(int(chunk_id) > 3):
+#	    ids_list.append(str(int(chunk_id)-1))
+#	    ids_list.append(str(int(chunk_id)-2))
     if chunk_id != None:
-        return load_tab(args.files,[chunk_id],args.ids)
+        return load_tab(args.files,ids_list,args.ids)
 
 
 def main():
