@@ -42,12 +42,12 @@ class StatsCalculator(object):
                 self.delays.append(new_delay)
                 if packet.has_size():
                     self.total_bytes += packet.size
-            if self.last_packet_was_ok():
-                new_jit = new_delay - self.last_delay
-                self.j_min   = self.min_val(new_jit,self.j_min)
-                self.j_max   = self.max_val(new_jit,self.j_max)
-                self.jitters.append(new_jit)
-            self.last_delay = new_delay
+                if self.last_packet_was_ok():
+                    new_jit = new_delay - self.last_delay
+                    self.j_min   = self.min_val(new_jit,self.j_min)
+                    self.j_max   = self.max_val(new_jit,self.j_max)
+                    self.jitters.append(new_jit)
+                self.last_delay = new_delay
 
     #def add_packet(self,p):
     #    packet = p[1]
@@ -83,6 +83,7 @@ class StatsCalculator(object):
 
     def summary(self):
         if self.invalid_chunk:
+            print("Invalid chunk : \n"+str(self))
             return self.empty_data()
         try:
             bw = None if self.stats_are_for_e2e else \

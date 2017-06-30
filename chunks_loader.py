@@ -332,22 +332,25 @@ class Packet:
         return r
 
     def swap(self,instructions):
-        if(self.instructions_has_good_length(instructions)):
-            f =  self.swap_index(instructions[0])
-            target = []
-            for i in instructions[1:-1]:
-                target.append(self.swap_index(i))
-            l =  self.swap_index(instructions[-1])
-            result = Packet(f,l,target,self.size)
-            if strictly_increasing(result.get_ts_as_list()):
-                return result
-            else :
-		#BUG : does currently not swap FIRST and LAST time
-                #print("Not increasing : "+str(result))
-                return result 
-        else:
-                raise ValueError(str(instructions)+' instructions'\
-                        +' do not apply with '+str(self))
+        try:
+            if(self.instructions_has_good_length(instructions)):
+                f =  self.swap_index(instructions[0])
+                target = []
+                for i in instructions[1:-1]:
+                    target.append(self.swap_index(i))
+                l =  self.swap_index(instructions[-1])
+                result = Packet(f,l,target,self.size)
+                if strictly_increasing(result.get_ts_as_list()):
+                    return result
+                else :
+	    	#BUG : does currently not swap FIRST and LAST time
+                    #print("Not increasing : "+str(result))
+                    return result 
+            else:
+                    raise ValueError(str(instructions)+' instructions'\
+                            +' do not apply with '+str(self))
+        except:
+            return self
 
     def swap_index(self,i):
         if i == 0:

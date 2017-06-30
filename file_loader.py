@@ -9,6 +9,8 @@ def check_all_files(file_data):
     result = False
     for name, size in file_data.items():
         update = has_file_changed(name,size)
+        if update == None:
+            raise FileNotFoundError
         has_changed = update[0]
         if has_changed:
             file_data[name] = update[1]
@@ -54,7 +56,7 @@ def has_file_changed(filename,prev_size):
             else:
                 return [False,None]
         except FileNotFoundError:
-            pass
+                raise FileNotFoundError
 
 #if __name__ == '__main__':
 #    check_file("data/random.txt")

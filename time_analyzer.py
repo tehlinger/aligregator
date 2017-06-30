@@ -7,7 +7,9 @@ from collections import OrderedDict
 def sort_packets_ts(unsorted_tab):
     swap_instructions = get_swap_instructions(unsorted_tab)
     #print("SWAP : "+str(swap_instructions))
-    return apply_swaps(swap_instructions,unsorted_tab)
+    result = apply_swaps(swap_instructions,unsorted_tab)
+    #print(result)
+    return result
 
 def apply_swaps(swap_instructions,unsorted_tab):
     for id,instructions in swap_instructions.instructions.items():

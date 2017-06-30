@@ -39,31 +39,38 @@ def loop(args):
         while is_running:
             try:
                 tab = load_new_chunks(agg,args)
+                #print("TAB : \n"+str(tab))
                 if tab:
+                    print("TAB : \n"+str(tab))
                     i += 1
                     #r = GlobalStats(tab)
                     tmp = sort_packets_ts(tab)
+                    print("SORTED TAB : \n"+str(tmp))
                     r = GlobalStats(tmp)
+                    #print("TMP : \n"+str(tmp))
+                    #print(r)
                     f = next(iter (r.flows_stats.values()))
-                    if i % 100 == 0:
+                    if i % 10 == 0:
                         i = 0
                         logger.info("E2E : "+str(f.e2e.del_stats.avg))
                     #print(r)
-                    print(r.to_json())
+                    #print(r.to_json())
+                    print(r)
                     print("\n================================\n")
                     #print(r.to_printable_json())
                     send_msg(r.to_json())
                 check_files_and_load_new_chunks(file_data,agg,args)
-                sleep (SLEEP_TIME)
+                #sleep (SLEEP_TIME)
             except FileNotFoundError :
+                agg = Aggregator(args.ids)
                 print("File not found")
                 sleep(1)
             except  KeyboardInterrupt:
                 raise
-            except Exception as e:
-                logger.critical(e)
-                print(e)
-                time.sleep(0.1)
+            #except Exception as e:
+            #    logger.critical(e)
+            #    print(e)
+            #    time.sleep(0.1)
     except (KeyboardInterrupt, SystemExit):
         print("\nApplication interrupted")
         #logger.critical("Application interrupted")
