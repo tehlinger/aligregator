@@ -26,9 +26,9 @@ def init_tab(chunk_ids,f_names,agent_ids):
 def load_chunks(tab,f_name,chunk_ids,position):
     for i in chunk_ids:
         chunk = load_chunk(i,f_name)
-        tab.add_chunk(chunk,position)
-        #if chunk != None:
-        #    tab.add_chunk(chunk,position)
+        #tab.add_chunk(chunk,position)
+        if chunk != None:
+            tab.add_chunk(chunk,position)
     return tab
 
 def load_chunk(chunk_id,filename):

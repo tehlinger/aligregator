@@ -41,21 +41,18 @@ def loop(args):
                 tab = load_new_chunks(agg,args)
                 #print("TAB : \n"+str(tab))
                 if tab:
-                    print("TAB : \n"+str(tab))
                     i += 1
                     #r = GlobalStats(tab)
                     tmp = sort_packets_ts(tab)
-                    print("SORTED TAB : \n"+str(tmp))
                     r = GlobalStats(tmp)
                     #print("TMP : \n"+str(tmp))
                     #print(r)
                     f = next(iter (r.flows_stats.values()))
                     if i % 10 == 0:
                         i = 0
-                        logger.info("E2E : "+str(f.e2e.del_stats.avg))
-                    #print(r)
-                    #print(r.to_json())
+                        logger.info("C-ID:"+str(r.chunk_id)+"|E2E : "+str(f.e2e.del_stats.avg)+"/s:"+str(f.e2e.loss_stats.s)+"|l:"+str(f.e2e.loss_stats.l))
                     print(r)
+                    #print(r.to_json())
                     print("\n================================\n")
                     #print(r.to_printable_json())
                     send_msg(r.to_json())
@@ -125,10 +122,11 @@ def check_files_and_load_new_chunks(file_data,agg,args):
 def load_new_chunks(agg,args):
     chunk_id = agg.get_next_chunk_to_load_id()
     ids_list = [chunk_id]
-#    if(int(chunk_id) > 3):
-#	    ids_list.append(str(int(chunk_id)-1))
-#	    ids_list.append(str(int(chunk_id)-2))
     if chunk_id != None:
+        if(int(chunk_id) > 3):
+            ids_list.append(int(chunk_id)-1)
+            ids_list.append(int(chunk_id)-2)
+            print("Looking through : "+str(ids_list))
         return load_tab(args.files,ids_list,args.ids)
 
 
