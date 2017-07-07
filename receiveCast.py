@@ -3,6 +3,7 @@ from subprocess import call
 import math
 import socket
 import struct
+import os
 import io 
 import pika
 import pickle
@@ -11,30 +12,52 @@ import sys
 import random  
 import time
 
-from log import *
-log = init_logger()
+#from log import *
+#log = init_logger()
 
-LIMIT = 32 
+LIMIT = 512 
+chunk_period = 3
+
+def write_chunk_in_file(lines,f):
+    for l in lines:
+        f.write(l)
+
+def new_chunk_begins(date_pkt,date_per_file,chunk_period,idPC):
+        return date_pkt - date_per_file[idPC] >= chunk_period
+
+def delete_files_if_necessary(chunk_id):
+    if chunk_id != 0 and chunk_id % LIMIT == 0:
+        os.system("rm *.dat") 
+
+def generate_line(data):
+    s_id = data.magic[0]
+    idPC = data.magic[n-1]
+    date_pkt = (data.magic[n-3]*2**32)/10**9 + data.magic[n-4]/10**9
+    bin_ip = data.magic[n-1]
+    p_id = (data.magic[n-6]+data.magic[n-5]*2**32+data.magic[n-7])
+    f_id = bin_to_int(data.magic[2])+":"+bin_to_int(data.magic[3])
+    size = data.magic[n-2]
+    return str(s_id)+"|"+ str(f_id)+"|"+ str(p_id)+"|"+ format(date_pkt,'.9f') +"|"+str(size)
 
 def bin_to_int(n):
     return socket.inet_ntoa(struct.pack("<L", n))
 
-def open_good_file(i):
+def get_file_name(i):
     ip = str(i)
     if ip == "218108076":
-        return open("a.dat","a") 
+        return "a.dat" 
     if ip == "318771372":
-        return open("b.dat","a") 
+        return "b.dat"
     if ip == "335548588":
-        return open("c.dat","a") 
+        return "c.dat"
     print("NO MATCH")
 
 date_per_file = {335548588:0, 318771372:0,218108076:0}
-id_per_file = {335548588:0, 318771372:0,218108076:0}
+id_per_file =   {335548588:0, 318771372:0,218108076:0}
+next_chunks_per_file = {335548588:[], 318771372:[],218108076:[]}
 
 n = 11
 chunk_id = 0
-chunk_period = 3
 count_pkt = 0
 
 class SkbEvent2(ct.Structure):
@@ -52,38 +75,23 @@ def callback(ch, method, properties, body):
     global chunk_id
     global date_per_file
 
-    s_id = data.magic[0]
+    line = generate_line(data) 
     idPC = data.magic[n-1]
-    date_pkt = (data.magic[n-4]+data.magic[n-3]*2**32)/10**9
-    bin_ip = data.magic[n-1]
-    p_id = (data.magic[n-6]+data.magic[n-5]*2**32+data.magic[n-7])
-    f_id = bin_to_int(data.magic[2])+":"+bin_to_int(data.magic[3])
-    size = data.magic[n-2]
+    date_pkt = (data.magic[n-3]*2**32)/10**9 + data.magic[n-4]/10**9
+    lines_list = next_chunks_per_file[idPC]
+    lines_list.append(line+"\n")
+    f_name = get_file_name(idPC)
 
-    line =   str(s_id)+"|"+ str(f_id)+"|"+ str(p_id)+"|"+ str(date_pkt)+"|"+str(size)
+    with  open(f_name,"a") as f:
+        delete_files_if_necessary(chunk_id)
+        if new_chunk_begins(date_pkt,date_per_file,chunk_period,idPC):
+            print(str(id_per_file[idPC])+"->" + str(f_name))
+            f.write("\t%s|%f|%f\n" % (id_per_file[idPC],date_per_file[idPC],date_pkt))
+            write_chunk_in_file(lines_list,f)
+            date_per_file[idPC] = date_pkt
+            id_per_file[idPC] +=1
+            next_chunks_per_file[idPC] = [] 
 
-    #print("%s %f %d" % (data.magic[n-1],date_pkt,data.magic[n-2]))
-    #with open("a.dat","a") as a,open("b.dat","a") as b,open("c.dat","a") as c:
-    f = open_good_file(idPC)
-    #f_name = open_good_file(idPC)
-    #f = open(f,"a")
-    if chunk_id != 0 and chunk_id % LIMIT == 0:
-        os.system("rm *.dat")
-    if (date_pkt - date_per_file[idPC] >= chunk_period):
-        chunk_id +=1
-        print("CHUNK "+str(int(math.floor(chunk_id/3))+" started in file " + ))
-        #f.write("\t%s|%f|%f\n" % (id_per_file[idPC],date_per_file[idPC],date_pkt))
-        #f.write(line+"\n") 
-        #print(line)
-        date_per_file[idPC] = date_pkt
-        log.info(str(id_per_file[idPC]))
-        id_per_file[idPC] +=1
-    f.write(line+"\n")
-    print(line)
-        #if random.randint(0,9)<5:
-        #    b.write("%s|%s|%f|%d\n" % (data.magic[0],(data.magic[n-4]+data.magic[n-3]*2**32),date_pkt+1,data.magic[n-2]))
-    #datetime.datetime.fromtimestamp(ts)
-    #print(str(float(str(data.magic[8])+"."+str(data.magic[7]))))
 channel.basic_consume(callback,
                       queue='castTest',
                       no_ack=True)

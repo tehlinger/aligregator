@@ -21,6 +21,7 @@ import time
 import os
 import pprint
 
+CHUNK_HISTORIC_SIZE = 3
 
 logger = init_logger()
 
@@ -51,14 +52,15 @@ def loop(args):
                     if i % 10 == 0:
                         i = 0
                         logger.info("C-ID:"+str(r.chunk_id)+"|E2E : "+str(f.e2e.del_stats.avg)+"/s:"+str(f.e2e.loss_stats.s)+"|l:"+str(f.e2e.loss_stats.l))
-                    print(r)
+                    print("C-ID:"+str(r.chunk_id)+"|E2E : "+str(f.e2e.del_stats.avg)+"/s:"+str(f.e2e.loss_stats.s)+"|l:"+str(f.e2e.loss_stats.l))
                     #print(r.to_json())
-                    print("\n================================\n")
+                    #print("\n================================\n")
                     #print(r.to_printable_json())
                     send_msg(r.to_json())
                 check_files_and_load_new_chunks(file_data,agg,args)
                 #sleep (SLEEP_TIME)
             except FileNotFoundError :
+                #agg = keep_trying_to_load(args,agg)
                 agg = Aggregator(args.ids)
                 print("File not found")
                 sleep(1)
@@ -123,10 +125,9 @@ def load_new_chunks(agg,args):
     chunk_id = agg.get_next_chunk_to_load_id()
     ids_list = [chunk_id]
     if chunk_id != None:
-        if(int(chunk_id) > 3):
-            ids_list.append(int(chunk_id)-1)
-            ids_list.append(int(chunk_id)-2)
-            print("Looking through : "+str(ids_list))
+        if(int(chunk_id) > CHUNK_HISTORIC_SIZE ):
+            for i in range(CHUNK_HISTORIC_SIZE):
+                ids_list.append(int(chunk_id)-i)
         return load_tab(args.files,ids_list,args.ids)
 
 
