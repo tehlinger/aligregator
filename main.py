@@ -40,8 +40,8 @@ def loop(args):
         while is_running:
             try:
                 tab = load_new_chunks(agg,args)
-                #print("TAB : \n"+str(tab))
                 if tab:
+#                    print("TAB : \n"+str(tab))
                     i += 1
                     #r = GlobalStats(tab)
                     tmp = sort_packets_ts(tab)
@@ -49,10 +49,10 @@ def loop(args):
                     #print("TMP : \n"+str(tmp))
                     #print(r)
                     f = next(iter (r.flows_stats.values()))
-                    if i % 10 == 0:
+                    if i % 2 == 0:
                         i = 0
                         logger.info("C-ID:"+str(r.chunk_id)+"|E2E : "+str(f.e2e.del_stats.avg)+"/s:"+str(f.e2e.loss_stats.s)+"|l:"+str(f.e2e.loss_stats.l))
-                    print("C-ID:"+str(r.chunk_id)+"|E2E : "+str(f.e2e.del_stats.avg)+"/s:"+str(f.e2e.loss_stats.s)+"|l:"+str(f.e2e.loss_stats.l))
+#                    print("C-ID:"+str(r.chunk_id)+"|E2E : "+str(f.e2e.del_stats.avg)+"/s:"+str(f.e2e.loss_stats.s)+"|l:"+str(f.e2e.loss_stats.l))
                     #print(r.to_json())
                     #print("\n================================\n")
                     #print(r.to_printable_json())
@@ -63,7 +63,7 @@ def loop(args):
                 #agg = keep_trying_to_load(args,agg)
                 agg = Aggregator(args.ids)
                 print("File not found")
-                sleep(1)
+                #sleep(1)
             except  KeyboardInterrupt:
                 raise
             except Exception as e:
@@ -120,6 +120,8 @@ def check_files_and_load_new_chunks(file_data,agg,args):
     change_detected = check_all_files(file_data)
     if change_detected:
         agg.update_files_meta(args.files)
+    else:
+        time.sleep(0.1)
 
 def load_new_chunks(agg,args):
     chunk_id = agg.get_next_chunk_to_load_id()

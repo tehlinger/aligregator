@@ -15,7 +15,7 @@ import time
 #from log import *
 #log = init_logger()
 
-LIMIT = 512 
+LIMIT = 32 
 chunk_period = 3
 
 def write_chunk_in_file(lines,f):
@@ -83,7 +83,7 @@ def callback(ch, method, properties, body):
     f_name = get_file_name(idPC)
 
     with  open(f_name,"a") as f:
-        delete_files_if_necessary(chunk_id)
+        delete_files_if_necessary(date_per_file[idPC])
         if new_chunk_begins(date_pkt,date_per_file,chunk_period,idPC):
             print(str(id_per_file[idPC])+"->" + str(f_name))
             f.write("\t%s|%f|%f\n" % (id_per_file[idPC],date_per_file[idPC],date_pkt))

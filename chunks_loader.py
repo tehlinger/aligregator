@@ -24,6 +24,7 @@ def init_tab(chunk_ids,f_names,agent_ids):
     return result
 
 def load_chunks(tab,f_name,chunk_ids,position):
+#    print("CHUNKS : "+str(chunk_ids))
     for i in chunk_ids:
         chunk = load_chunk(i,f_name)
         #tab.add_chunk(chunk,position)
